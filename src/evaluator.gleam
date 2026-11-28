@@ -107,14 +107,14 @@ fn eval(expr: Expr, env: Env) -> Result(Value, EvalError) {
     LiteralInt(n) -> Ok(VInt(n))
     LiteralList(elems, rest) -> eval_list(elems, rest, env)
     Call(fn_expr, operands) ->
-      // YOUR CODE HERE (replace the code below)
-      Error(errors.NotImplemented(
-        "Call("
-        <> string.inspect(fn_expr)
-        <> ", "
-        <> string.inspect(operands)
-        <> ")",
-      ))
+      case eval(fn_expr, env) {
+        Error(e) -> Error(e)
+        Ok(function) ->
+          case list.try_map(operands, fn(operand) { eval(operand, env) }) {
+            Error(e) -> Error(e)
+            Ok(args) -> apply(function, args)
+          }
+      }
     // Evaluate the expression v exactly once, then extend env to include
     // the name bound to its value; finally, evaluate the body of the let.
     Let(name, v, body) ->
@@ -198,14 +198,7 @@ pub fn apply(f: Value, args: List(Value)) -> Result(Value, EvalError) {
         False -> Error(wrong_num_args(callable.name, wanted, list.length(args)))
         True ->
           case callable {
-            Builtin(_, _, run) ->
-              // YOUR CODE HERE (replace the code below)
-              Error(errors.NotImplemented(
-                "Builtin("
-                <> string.inspect(run)
-                <> ") with "
-                <> string.inspect(args),
-              ))
+            Builtin(_, _, run) -> run(args)
             UserFn(_, params, body, parent) ->
               // YOUR CODE HERE (replace the code below)
               Error(errors.NotImplemented(
