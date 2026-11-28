@@ -167,19 +167,10 @@ fn eval_list(
 ) -> Result(Value, EvalError) {
   case list.try_map(elems, fn(e) { eval(e, env) }), rest {
     Error(e), _ -> Error(e)
-    // YOUR CODE HERE (replace the code below)
-    Ok(head), None ->
-      Error(errors.NotImplemented("list of " <> string.inspect(head)))
+    Ok(head), None -> Ok(VList(head))
     Ok(head), Some(r) ->
       case eval(r, env) {
-        // YOUR CODE HERE (replace the code below)
-        Ok(VList(tail)) ->
-          Error(errors.NotImplemented(
-            "list of "
-            <> string.inspect(head)
-            <> " then "
-            <> string.inspect(tail),
-          ))
+        Ok(VList(tail)) -> Ok(VList(list.append(head, tail)))
         Ok(other) ->
           Error(TypeError("`..` expects a list, got " <> describe(other)))
         Error(e) -> Error(e)
