@@ -120,16 +120,7 @@ fn eval(expr: Expr, env: Env) -> Result(Value, EvalError) {
     Let(name, v, body) ->
       case eval(v, env) {
         Error(e) -> Error(e)
-        // YOUR CODE HERE (replace the code below)
-        Ok(value) ->
-          Error(errors.NotImplemented(
-            "let "
-            <> name
-            <> " = "
-            <> string.inspect(value)
-            <> " in "
-            <> string.inspect(body),
-          ))
+        Ok(value) -> eval(body, extend(env, [#(name, value)]))
       }
     Case(subject, arms) ->
       // YOUR CODE HERE (replace the code below)
